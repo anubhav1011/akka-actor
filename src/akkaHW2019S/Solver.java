@@ -8,21 +8,24 @@ import akka.actor.UntypedActor;
  * This is the main actor and the only actor that is created directly under the
  * {@code ActorSystem} This actor creates 4 child actors
  * {@code Searcher}
- * 
- * @author Akash Nagesh and M. Kokar
  *
+ * @author Akash Nagesh and M. Kokar
  */
 public class Solver extends UntypedActor {
 
-	public Solver() {
+    public Solver() {
+    }
 
-	}
+    @Override
+    public void onReceive(Object msg) {
+        if (msg instanceof String) {
+            String message = (String) msg;
+            if (message.equals("start")) {
+            }
 
-	@Override
-	public void onReceive(Object msg) throws Throwable {
-		
-		//Code to implement
 
-	}
+        }
+        //Code to implement
+    }
 
 }
