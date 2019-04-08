@@ -18,33 +18,13 @@ import java.util.Scanner;
 public class User {
 
     public static void main(String[] args) throws Exception {
-//        ActorSystem system = ActorSystem.create("EstimationSystem");
-//        Props searcherProps = Props.create(Searcher.class);
-//        ActorRef searcherActor = system.actorOf(searcherProps, "searcherActor");
-        URL path = User.class.getResource("cities.txt");
-        File f = new File(path.getFile());
-        // reader = new BufferedReader(new FileReader(f));
-        Scanner sc = new Scanner(new BufferedReader(new FileReader(f)));
-        int rows = 0;
-        while (sc.hasNextLine()) {
-            sc.nextLine();
-            rows++;
-        }
-        int[][] citiesArray = new int[rows][rows];
-        sc = new Scanner(new BufferedReader(new FileReader(f)));
-        for (int i = 0; i < citiesArray.length; i++) {
-            String[] line = sc.nextLine().trim().split(" ");
-            for (int j = 0; j < line.length; j++) {
-                citiesArray[i][j] = Integer.parseInt(line[j]);
-            }
+        ActorSystem system = ActorSystem.create("EstimationSystem");
+        Props solverProps = Props.create(Solver.class);
+        ActorRef searcherActor = system.actorOf(solverProps, "searcherActor");
+        searcherActor.tell("StartProcessing", null);
+        //system.terminate();
 
-        }
-        for (int i = 0; i < citiesArray.length; i++) {
-            for (int j = 0; j < citiesArray[i].length; j++) {
-                System.out.print(citiesArray[i][j] + " ");
-            }
-            System.out.println();
-        }
+
 
 
 

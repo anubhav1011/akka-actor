@@ -23,7 +23,7 @@ public class TspDynamicProgrammingRecursive {
     private boolean ranSolver = false;
 
     public TspDynamicProgrammingRecursive(double[][] distance) {
-        this(3, distance);
+        this(0, distance);
     }
 
     public TspDynamicProgrammingRecursive(int startNode, double[][] distance) {
