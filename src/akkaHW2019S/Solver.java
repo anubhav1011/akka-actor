@@ -10,6 +10,7 @@ import java.util.Scanner;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
+import akka.dispatch.sysmsg.Terminate;
 
 /**
  * This is the main actor and the only actor that is created directly under the
@@ -48,11 +49,10 @@ public class Solver extends UntypedActor {
         if (msg instanceof String) {
             String message = (String) msg;
             if (message.equals("StartProcessing")) {
-                System.out.println("I have started");
                 for (int i = 1; i < 5; i++) {
                     // System.out.println("Creating");
                     Props propsSearcher = Props.create(Searcher.class, 0, this.citiesArray, "Searcher Agent " + i);
-                    ActorRef searcherActor = getContext().actorOf(propsSearcher);
+                    ActorRef searcherActor = getContext().actorOf(propsSearcher, "Agent" + i);
                     searcherActor.tell("Start Solving", getSelf());
                 }
             }
@@ -62,6 +62,11 @@ public class Solver extends UntypedActor {
                 Solution sol = (Solution) msg;
                 System.out.println("Winner is" + sol);
                 this.solutionSubmitted = true;
+                for (ActorRef actor : getContext().getChildren()) {
+                    actor.tell(sol, getSelf());
+                }
+                context().stop(getSelf());
+                context().system().terminate();
             }
         }
         //Code to implement

@@ -51,13 +51,25 @@ public class Searcher extends UntypedActor {
         if (msg instanceof String) {
             if (msg.equals("Start Solving")) {
                 Solution sol = solve();
-                sol.setAgentName(this.name);
+                //sol.setAgentName(this.name);
+                sol.setAgentName(getSelf().path().name());
                 //System.out.println(getSelf().path().name());
                 //System.out.println(sol);
                 getSender().tell(sol, getSelf());
 
 
             }
+        } else if (msg instanceof Solution) {
+            Solution sol = (Solution) msg;
+            String name = sol.getAgentName();
+            if (name.equals(getSelf().path().name())) {
+                System.out.println("Path: " + getSelf().path().toString() + " Message: " + "I Won");
+            } else {
+                System.out.println("Path: " + getSelf().path().toString() + " Message: " + name + " won");
+            }
+            context().stop(getSelf());
+
+
         }
     }
 
