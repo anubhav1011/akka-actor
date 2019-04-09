@@ -1,5 +1,6 @@
 package akkaHW2019S;
 
+import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 
 import java.util.ArrayList;
@@ -22,10 +23,10 @@ public class Searcher extends UntypedActor {
 
     private List<Integer> tour = new ArrayList<>();
     private boolean ranSolver = false;
-    private final String name;
+    //private final String name;
 
 
-    public Searcher(int startNode, double[][] distance, String name) {
+    public Searcher(int startNode, double[][] distance) {
         this.distance = distance;
         N = distance.length;
         START_NODE = startNode;
@@ -40,7 +41,7 @@ public class Searcher extends UntypedActor {
         // The finished state is when the finished state mask has all bits are set to
         // one (meaning all the nodes have been visited).
         FINISHED_STATE = (1 << N) - 1;
-        this.name = name;
+        // this.name = name;
         // TODO
     }
 
@@ -59,6 +60,14 @@ public class Searcher extends UntypedActor {
 
 
             }
+        }
+        if (msg instanceof SearchMessage) {
+            SearchMessage searchMessage = (SearchMessage) msg;
+            Solution sol = solve();
+            sol.setAgentName(getSelf().path().name());
+            for (ActorRef actorRef : searchMessage.getActorRefList()) {
+                actorRef.tell(sol, getSelf());
+            }
         } else if (msg instanceof Solution) {
             Solution sol = (Solution) msg;
             String name = sol.getAgentName();
@@ -68,8 +77,6 @@ public class Searcher extends UntypedActor {
                 System.out.println("Path: " + getSelf().path().toString() + " Message: " + name + " won");
             }
             context().stop(getSelf());
-
-
         }
     }
 

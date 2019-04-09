@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import akka.actor.ActorRef;
@@ -24,7 +26,7 @@ public class Solver extends UntypedActor {
 
     private double[][] citiesArray;
 
-    private static final int SEARCHER_AGENTS = 4;
+    private static final int SEARCHER_AGENTS = 5;
 
     private boolean solutionSubmitted = false;
 
@@ -48,13 +50,21 @@ public class Solver extends UntypedActor {
         //System.out.println("Entering with message " + msg);
         if (msg instanceof String) {
             String message = (String) msg;
+            Props propsSearcher = Props.create(Searcher.class, 0, this.citiesArray);
             if (message.equals("StartProcessing")) {
-                for (int i = 1; i < 5; i++) {
+                List<ActorRef> actorRefs = new ArrayList<>();
+                for (int i = 1; i < SEARCHER_AGENTS; i++) {
                     // System.out.println("Creating");
-                    Props propsSearcher = Props.create(Searcher.class, 0, this.citiesArray, "Searcher Agent " + i);
                     ActorRef searcherActor = getContext().actorOf(propsSearcher, "Agent" + i);
-                    searcherActor.tell("Start Solving", getSelf());
+                    //searcherActor.tell("Start Solving", getSelf());
+                    actorRefs.add(searcherActor);
                 }
+                SearchMessage searchMessage = new SearchMessage(actorRefs, this.citiesArray, 0);
+                for (ActorRef actor : getContext().getChildren()) {
+                    actor.tell(searchMessage, getSelf());
+                }
+
+
             }
 
         } else if (msg instanceof Solution) {
