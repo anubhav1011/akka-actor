@@ -65,9 +65,12 @@ public class Searcher extends UntypedActor {
             SearchMessage searchMessage = (SearchMessage) msg;
             Solution sol = solve();
             sol.setAgentName(getSelf().path().name());
-            for (ActorRef actorRef : searchMessage.getActorRefList()) {
-                actorRef.tell(sol, getSelf());
-            }
+//            for (ActorRef actorRef : searchMessage.getActorRefList()) {
+//                actorRef.tell(sol, getSelf());
+//            }
+            getSender().tell(sol, getSelf());
+
+
         } else if (msg instanceof Solution) {
             Solution sol = (Solution) msg;
             String name = sol.getAgentName();
