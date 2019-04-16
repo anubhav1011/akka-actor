@@ -1,6 +1,5 @@
 package akkaHW2019S;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -58,12 +57,16 @@ public class Solution {
 
     @Override
     public String toString() {
-        return "Solution{" +
+//        return "Solution{" +
+//                "minTourCost=" + minTourCost +
+//                ", tour=" + tour +
+//                ", time=" + time +
+//                ", timeinMillis=" + timeinMillis +
+//                ", agentName='" + agentName + '\'' +
+//                '}';
+        return "Path is {" +
                 "minTourCost=" + minTourCost +
                 ", tour=" + tour +
-                ", time=" + time +
-                ", timeinMillis=" + timeinMillis +
-                ", agentName='" + agentName + '\'' +
                 '}';
     }
 }

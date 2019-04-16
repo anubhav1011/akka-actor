@@ -1,9 +1,9 @@
 package akkaHW2019S;
 
-import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +16,7 @@ public class Searcher extends UntypedActor {
 
     private final int N;
     private final int START_NODE;
+    private final int DESIRED_LENGTH;
     private final int FINISHED_STATE;
 
     private double[][] distance;
@@ -23,11 +24,14 @@ public class Searcher extends UntypedActor {
 
     private List<Integer> tour = new ArrayList<>();
     private boolean ranSolver = false;
+
+    private Solution solution;
     //private final String name;
 
 
-    public Searcher(int startNode, double[][] distance) {
+    public Searcher(int startNode, int desiredLength, double[][] distance) {
         this.distance = distance;
+        this.DESIRED_LENGTH = desiredLength;
         N = distance.length;
         START_NODE = startNode;
         // Validate inputs.
@@ -52,6 +56,7 @@ public class Searcher extends UntypedActor {
         if (msg instanceof String) {
             if (msg.equals("Start Solving")) {
                 Solution sol = solve();
+                this.solution = sol;
                 //sol.setAgentName(this.name);
                 sol.setAgentName(getSelf().path().name());
                 //System.out.println(getSelf().path().name());
@@ -64,6 +69,7 @@ public class Searcher extends UntypedActor {
         if (msg instanceof SearchMessage) {
             SearchMessage searchMessage = (SearchMessage) msg;
             Solution sol = solve();
+            this.solution = sol;
             sol.setAgentName(getSelf().path().name());
 //            for (ActorRef actorRef : searchMessage.getActorRefList()) {
 //                actorRef.tell(sol, getSelf());
@@ -75,9 +81,9 @@ public class Searcher extends UntypedActor {
             Solution sol = (Solution) msg;
             String name = sol.getAgentName();
             if (name.equals(getSelf().path().name())) {
-                System.out.println("Path: " + getSelf().path().toString() + " Message: " + "I Won");
+                System.out.println(getSelf().path().name() + " Path: " + this.solution.getTour() + " Message: " + "I Won");
             } else {
-                System.out.println("Path: " + getSelf().path().toString() + " Message: " + name + " won");
+                System.out.println(getSelf().path().name() + " Path: " + this.solution.getTour() + " Message: " + name + " won");
             }
             context().stop(getSelf());
         }

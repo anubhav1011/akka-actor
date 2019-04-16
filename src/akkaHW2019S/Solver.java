@@ -10,9 +10,12 @@ import java.util.List;
 import java.util.Scanner;
 
 import akka.actor.ActorRef;
+import akka.actor.DeadLetter;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
 import akka.dispatch.sysmsg.Terminate;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 
 /**
  * This is the main actor and the only actor that is created directly under the
@@ -23,26 +26,37 @@ import akka.dispatch.sysmsg.Terminate;
  */
 public class Solver extends UntypedActor {
 
+    LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+
 
     private double[][] citiesArray;
+
+    private int counter = 4;
+
+    private int startNode;
+
+    private int desiredLength;
 
     private static final int SEARCHER_AGENTS = 5;
 
     private boolean solutionSubmitted = false;
 
-    public Solver() {
-        init();
+
+    public Solver(int startNode, int desiredLength, double[][] citiesArray) {
+        this.citiesArray = citiesArray;
+        this.startNode = startNode;
+        this.desiredLength = desiredLength;
+        //init();
     }
-
-    private void init() {
-        try {
-            this.citiesArray = getCitiesArray();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-
-    }
+//    private void init() {
+//        try {
+//            this.citiesArray = getCitiesArray();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//
+//
+//    }
 
 
     @Override
@@ -50,7 +64,7 @@ public class Solver extends UntypedActor {
         //System.out.println("Entering with message " + msg);
         if (msg instanceof String) {
             String message = (String) msg;
-            Props propsSearcher = Props.create(Searcher.class, 0, this.citiesArray);
+            Props propsSearcher = Props.create(Searcher.class, this.startNode, this.desiredLength, this.citiesArray);
             if (message.equals("StartProcessing")) {
                 List<ActorRef> actorRefs = new ArrayList<>();
                 for (int i = 1; i < SEARCHER_AGENTS; i++) {
@@ -68,15 +82,21 @@ public class Solver extends UntypedActor {
             }
 
         } else if (msg instanceof Solution) {
+            counter--;
             if (!solutionSubmitted) {
                 Solution sol = (Solution) msg;
-                System.out.println("Winner is" + sol);
+                // System.out.println("Winner is" + sol);
                 this.solutionSubmitted = true;
                 for (ActorRef actor : getContext().getChildren()) {
                     actor.tell(sol, getSelf());
                 }
+
+
+            }
+            if (counter == 0) {
                 context().stop(getSelf());
                 context().system().terminate();
+
             }
         }
         //Code to implement
@@ -110,5 +130,12 @@ public class Solver extends UntypedActor {
         }
         return citiesArray;
     }
+
+
+    @Override
+    public void unhandled(Object message) {
+        // clean up resources here ...
+    }
+
 
 }
