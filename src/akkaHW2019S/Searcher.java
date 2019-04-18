@@ -80,10 +80,16 @@ public class Searcher extends UntypedActor {
         } else if (msg instanceof Solution) {
             Solution sol = (Solution) msg;
             String name = sol.getAgentName();
+            double minTourCost = sol.getMinTourCost();
+            if (sol.getMinTourCost() > this.DESIRED_LENGTH) {
+                System.out.println(getSelf().path().name() + " Message: " + "Not able to find Path with length less than desired Length");
+                context().stop(getSelf());
+                return;
+            }
             if (name.equals(getSelf().path().name())) {
-                System.out.println(getSelf().path().name() + " Path: " + this.solution.getTour() + " Message: " + "I Won");
+                System.out.println(getSelf().path().name() + " Path: " + this.solution.getTour() + " Length: " + (int) this.minTourCost + " Message: " + "I Won");
             } else {
-                System.out.println(getSelf().path().name() + " Path: " + this.solution.getTour() + " Message: " + name + " won");
+                System.out.println(getSelf().path().name() + " Path: " + this.solution.getTour() + " Length: " + (int) this.minTourCost + " Message: " + name + " won");
             }
             context().stop(getSelf());
         }
@@ -99,15 +105,16 @@ public class Searcher extends UntypedActor {
         // Regenerate path
         int index = START_NODE;
         while (true) {
-            tour.add((int) distance[0][index]);
-            //tour.add(index);
+            //tour.add((int) distance[0][index]);
+            tour.add(index);
             Integer nextIndex = prev[index][state];
             if (nextIndex == null) break;
             int nextState = state | (1 << nextIndex);
             state = nextState;
             index = nextIndex;
         }
-        tour.add((int) distance[0][START_NODE]);
+        //tour.add((int) distance[0][START_NODE]);
+        tour.add(START_NODE);
         ranSolver = true;
         return new Solution(minTourCost, tour, new Date(), System.currentTimeMillis());
 

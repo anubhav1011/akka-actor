@@ -25,7 +25,6 @@ public class User {
     int maximumPathLength;
 
 
-
     public void init() {
         boolean valid = false;
         while (!valid) {
@@ -119,12 +118,20 @@ public class User {
             System.out.println("Please enter valid city index");
             return null;
         }
+        System.out.println();
+        System.out.println("###############");
+        System.out.println("Input Matrix is");
+        System.out.println("###############");
+        System.out.println();
         for (int i = 0; i < citiesArray.length; i++) {
             for (int j = 0; j < citiesArray[i].length; j++) {
                 System.out.print(citiesArray[i][j] + " ");
             }
             System.out.println();
         }
+        System.out.println();
+        System.out.println();
+        System.out.println();
         return citiesArray;
     }
 

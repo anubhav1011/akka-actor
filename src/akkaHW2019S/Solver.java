@@ -85,7 +85,10 @@ public class Solver extends UntypedActor {
             counter--;
             if (!solutionSubmitted) {
                 Solution sol = (Solution) msg;
-                // System.out.println("Winner is" + sol);
+                System.out.println("#############################");
+                System.out.println("Please find below the results");
+                System.out.println("#############################");
+                System.out.println();
                 this.solutionSubmitted = true;
                 for (ActorRef actor : getContext().getChildren()) {
                     actor.tell(sol, getSelf());
